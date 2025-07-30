@@ -1,4 +1,4 @@
-# CP 7 Evvaluation PHP et PDO
+# CP 7 Evaluation PHP et PDO
 
 ## Projet: Application web de gestion de tournois e-sport
 
