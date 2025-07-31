@@ -139,3 +139,6 @@ d’une équipe, afin de mieux connaître mes adversaires ou coéquipiers.
 
 • En tant que joueur, je veux voir la liste des tournois auxquels mon équipe est inscrite, afin de
 gérer mon calendrier.
+
+### Lien repository GitHub
+https://github.com/Zitoone/cp7-gestion-de-tournois-e-sport

@@ -19,15 +19,6 @@ function addNewUser($pdo, $username, $email, $password){
     return $stmt->rowCount();
 } // Cette fonction permet d'ajouter un nouvel utilisateur à la bdd avec la requête préparée INSERT INTO users. la metholde rowCount retournera le nombre de ligne affectée par la derniere requete
 
-/* function getPassword($pdo, $email){
-    $stmt=$pdo->prepare("SELECT id, password_hash FROM users WHERE email=:email");
-    $stmt->execute(array(
-        "email"=>$email
-    ));
-    $user=$stmt->fetch();
-    return($user["password_hash"]);
-}  */
-
 function getUser($pdo, $email){
     $stmt = $pdo->prepare("SELECT id, username, email, password_hash FROM users WHERE email = :email");
     $stmt->execute([
@@ -43,6 +34,46 @@ function modifyAccount($pdo, $username, $email, $id){
         "username"=>$username,
         "email"=>$email,
         "id"=>$id
+    ));
+    return $stmt->rowCount();
+}
+
+function teamExists($pdo, $name) {
+    $stmt = $pdo->prepare("SELECT * FROM teams WHERE name = :name");
+    $stmt->execute(array(
+        "name" => $name
+    ));
+    return $stmt->rowCount();
+}
+function addTeam($pdo, $name){
+    $stmt=$pdo->prepare("INSERT INTO teams(name) VALUES (:name)");
+    $stmt->execute(array(
+        "name"=>$name
+    ));
+    return $pdo->lastInsertId();
+}
+
+function getTeamNameById($pdo, $teamId) {
+    $stmt = $pdo->prepare("SELECT name FROM teams WHERE id = :id");
+    $stmt->execute(array(
+        "id" => $teamId
+    ));
+    $team = $stmt->fetch();
+    return $team["name"];
+}
+
+function getUsers($pdo){
+    $stmt = $pdo->prepare("SELECT id, username FROM users WHERE role='player'");
+    $stmt->execute();
+    $users = $stmt->fetchAll();
+    return($users); 
+}
+
+function addPlayerInTeam($pdo, $user_id, $team_id){
+    $stmt=$pdo->prepare("INSERT INTO team_members(user_id, team_id) VALUES (:user_id, :team_id");
+    $stmt->execute(array(
+        "user_id"=>$user_id,
+        "team_id"=>$team_id
     ));
     return $stmt->rowCount();
 }

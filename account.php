@@ -49,6 +49,12 @@ if(!empty($_POST["update"])){
    <br>
 
     <a href="connexion.php">Log out</a>
+
+    <br>
+    <a href="new-team.php">Create your team</a>
+
+    <br>
+    <a href="join-team.php">Join a team</a>
     
 </body>
 </html>
