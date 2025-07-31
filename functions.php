@@ -38,28 +38,49 @@ function modifyAccount($pdo, $username, $email, $id){
     return $stmt->rowCount();
 }
 
-function teamExists($pdo, $name) {
+function teamExists($pdo, $team_name) {
     $stmt = $pdo->prepare("SELECT * FROM teams WHERE name = :name");
     $stmt->execute(array(
-        "name" => $name
+        "name" => $team_name
     ));
     return $stmt->rowCount();
 }
-function addTeam($pdo, $name){
+
+//Fonction avec 2 requêtes pour ajouter une team a la liste et en même temps ajouté l'utilisateur qui l'a crée en captain
+function addTeam($pdo, $team_name, $user_id, $role="captain"){
     $stmt=$pdo->prepare("INSERT INTO teams(name) VALUES (:name)");
     $stmt->execute(array(
-        "name"=>$name
+        "name"=>$team_name
     ));
-    return $pdo->lastInsertId();
+// Ensuite on verifie si l'insert a fonctionné (1)
+    if($stmt->rowCount()>0){
+        $team_id = $pdo->lastInsertId();
+
+        $stmt2=$pdo->prepare("INSERT INTO team_members(user_id, team_id, role_in_team) VALUES (:user_id, :team_id, :role)");
+        $stmt2->execute(array(
+        "user_id"=>$user_id,
+        "team_id"=>$team_id,
+        "role"=>$role
+        ));
+        return $team_id;
+    }
+    return false;
 }
 
-function getTeamNameById($pdo, $teamId) {
+/* function getTeamNameById($pdo, $teamId) {
     $stmt = $pdo->prepare("SELECT name FROM teams WHERE id = :id");
     $stmt->execute(array(
         "id" => $teamId
     ));
     $team = $stmt->fetch();
     return $team["name"];
+} */
+
+function getTeams($pdo){
+    $stmt=$pdo->prepare("SELECT id, name FROM teams");
+    $stmt->execute();
+    $teams = $stmt->fetchAll();
+    return($teams);
 }
 
 function getUsers($pdo){
@@ -70,7 +91,7 @@ function getUsers($pdo){
 }
 
 function addPlayerInTeam($pdo, $user_id, $team_id){
-    $stmt=$pdo->prepare("INSERT INTO team_members(user_id, team_id) VALUES (:user_id, :team_id");
+    $stmt=$pdo->prepare("INSERT INTO team_members(user_id, team_id) VALUES (:user_id, :team_id)");
     $stmt->execute(array(
         "user_id"=>$user_id,
         "team_id"=>$team_id
