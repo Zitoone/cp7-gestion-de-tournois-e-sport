@@ -4,13 +4,16 @@ require_once "config/connect.php";
 require_once "functions.php"; 
 
 $id=$_SESSION["id"];
+$user_role=$_SESSION["role"];
 $msg="";
 
-$stmt = $pdo->prepare("SELECT id, username, email FROM users WHERE id=:id");
+$stmt = $pdo->prepare("SELECT id, username, email, role FROM users WHERE id=:id");
 $stmt->execute(array(
     'id' => $id
 ));
 $user = $stmt->fetch();
+
+$_SESSION['role'] = $user['role']; 
 
 if(!empty($_POST["update"])){
     $username=$_POST["username"];
@@ -22,6 +25,7 @@ if(!empty($_POST["update"])){
         $msg='<span style="color:red; font-weight:bold; font-size:120%;">Update failed</span>';
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -34,7 +38,7 @@ if(!empty($_POST["update"])){
 <body>
     <h1>User account</h1>
 
-<form action="?mode=edition&id=<?=$id?>" method="post">
+<form action="#" method="post">
    <label for="username">Username :</label>
    <input type="text" name="username" id="username" value="<?=$user['username'] ?>">
 
@@ -51,6 +55,8 @@ if(!empty($_POST["update"])){
     <a href="logout.php">Log out</a>
     <br>
     <a href="teams.php">Teams</a>
+    <br>
+    <a href="tournaments.php">Tournois</a>
     
 </body>
 </html>

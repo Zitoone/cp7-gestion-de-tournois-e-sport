@@ -76,9 +76,11 @@ function addTeam($pdo, $team_name, $user_id, $role="captain"){
     return $team["name"];
 } */
 
-function getTeams($pdo){
-    $stmt=$pdo->prepare("SELECT id, name FROM teams");
-    $stmt->execute();
+function getTeamsFromConnectedUser($pdo,$user_id){
+    $stmt=$pdo->prepare("SELECT t.id, t.name FROM teams t INNER JOIN team_members tm ON t.id=tm.team_id INNER JOIN users u ON u.id=tm.user_id WHERE u.id=:id AND tm.role_in_team='captain'");
+    $stmt->execute(array(
+        "id"=>$user_id
+    ));
     $teams = $stmt->fetchAll();
     return($teams);
 }
@@ -97,4 +99,33 @@ function addPlayerInTeam($pdo, $user_id, $team_id){
         "team_id"=>$team_id
     ));
     return $stmt->rowCount();
+}
+
+function getAllTeamsExceptUser($pdo, $user_id){
+    $stmt=$pdo->prepare("SELECT DISTINCT t.id, t.name FROM teams t INNER JOIN team_members tm ON t.id=tm.team_id INNER JOIN users u ON u.id=tm.user_id WHERE tm.user_id!=:id");
+    $stmt->execute(array(
+        "id"=>$user_id
+    ));
+    $teams = $stmt->fetchAll();
+    return($teams);
+}
+
+function getTournaments($pdo){
+    $stmt=$pdo->prepare("SELECT t.id, t.name, t.game, t.description, t.start_date, t.end_date FROM tournaments t");
+    $stmt->execute();
+    $tournaments=$stmt->fetchAll();
+    return($tournaments);
+}
+
+function addTeamInTournament($pdo, $team_id, $tournament_id){
+    $stmt=$pdo->prepare("INSERT INTO registrations(team_id, tournament_id) VALUES (:team_id, :tournament_id)");
+    $stmt->execute(array(
+        "team_id"=>$team_id,
+        "tournament_id"=>$tournament_id
+    ));
+    return $stmt->rowCount();
+}
+
+function addNewTournament($pdo, $name, $game, $description, $stard, $end){
+
 }
