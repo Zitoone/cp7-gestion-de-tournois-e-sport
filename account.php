@@ -3,17 +3,20 @@ session_start();
 require_once "config/connect.php";
 require_once "functions.php"; 
 
-$id=$_SESSION["id"];
-$user_role=$_SESSION["role"];
-$msg="";
 
+$msg="";
+$id = $_SESSION['id'];
 $stmt = $pdo->prepare("SELECT id, username, email, role FROM users WHERE id=:id");
 $stmt->execute(array(
     'id' => $id
 ));
 $user = $stmt->fetch();
-
-$_SESSION['role'] = $user['role']; 
+if ($user) {
+    $_SESSION['id']=$user['id'];
+    $_SESSION['role'] = $user['role'];
+} else {
+    $msg="No user";
+}
 
 if(!empty($_POST["update"])){
     $username=$_POST["username"];
@@ -39,6 +42,9 @@ if(!empty($_POST["update"])){
     <h1>User account</h1>
 
 <form action="#" method="post">
+
+    <input type="hidden" name="id" id="id" value="<?=$user['id'] ?>">
+
    <label for="username">Username :</label>
    <input type="text" name="username" id="username" value="<?=$user['username'] ?>">
 

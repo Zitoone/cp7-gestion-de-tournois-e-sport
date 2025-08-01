@@ -5,6 +5,12 @@ require_once "functions.php";
 
 $user_id=$_SESSION["id"];
 $user_role=$_SESSION["role"];
+if (isset($_POST['modify_tournament'])) {
+    $_SESSION['tournament_id'] = $_POST['modify_tournament'];
+    header('Location: modify_tournament.php');
+    exit;
+}
+
 
 $msg="";
 $isError= false;
@@ -29,6 +35,8 @@ if(!empty($_POST["submit_add_tournament"])){
     }
 }
 //Gestion du form d'ajout de nouveau tournois
+$msg2="";
+$isError=false;
 if(!empty($_POST["submit_new_tournament"])){
     if(empty($_POST["name"])){
         $msg2= '<span style="color:red; font-weight:bold; font-size:120%;">Please enter the name of the tournament</span>';
@@ -51,12 +59,19 @@ if(!empty($_POST["submit_new_tournament"])){
         $isError=true;
     }
     if(!$isError){
-        
+        $name=$_POST["name"];
+        $game=$_POST["game"];
+        $description=$_POST["description"];
+        $start=$_POST["start"];
+        $end=$_POST["end"];
+        $new_tourn=addNewTournament($pdo, $name, $game, $description, $start, $end, $user_id);
+        if($new_tourn){
+            $msg2 = '<span style="color:green; font-weight:bold; font-size:120%;">New tournament is added</span>';
+        } else {
+            $msg2 = '<span style="color:red; font-weight:bold; font-size:120%;">Something failed</span>';
+        }
     }
-
 }
-$msg2="";
-$isError=false;
 
 ?>
 <!DOCTYPE html>
@@ -74,7 +89,22 @@ $isError=false;
         $tournaments=getTournaments($pdo);
         foreach($tournaments as $tournament):?>
             <li>
-                <?= $tournament['name'] ?>
+                <?= $tournament['name'] ?> 
+                <?php if($user_role=="organizer"):?>
+            <form method="POST" action="modify_tournament.php">
+                <button type="submit" name="tournament_id" value="<?= $tournament['id'] ?>">Modify</button>
+            </form>
+
+
+            </form>
+            <?php endif; ?>
+
+            <?php if($user_role=="admin"):?>
+            <form method="POST" action="delete_tournament.php">
+                <button type="submit" name="delete_tournament">Delete</button>
+            </form>
+            <?php endif; ?>
+            
                 <ul>
                     <li><?= $tournament['game'] ?></li>
                     <li><?= $tournament['description'] ?></li>
@@ -123,22 +153,22 @@ $isError=false;
 if($user_role=="organizer"):?>
     <h2>Add a tournament</h2>
         <form action="#" method="post">
-        <label for="name">Name</label>
-        <input type="name" name="name" id="name">
+            <label for="name">Name</label>
+            <input type="name" name="name" id="name">
 
-        <label for="game">Game</label>
-        <input type="game" name="game" id="game">
+            <label for="game">Game</label>
+            <input type="game" name="game" id="game">
 
-        <label for="description">Description</label>
-        <textarea name="description" id="description"></textarea>
+            <label for="description">Description</label>
+            <textarea name="description" id="description"></textarea>
 
-        <label for="start">Start date</label>
-        <input type="date" name="start" id="start">
+            <label for="start">Start date</label>
+            <input type="date" name="start" id="start">
 
-        <label for="end">End date</label>
-        <input type="date" name="end" id="end">
+            <label for="end">End date</label>
+            <input type="date" name="end" id="end">
 
-        <input type="submit" name="submit_new_tournament" value="Add a tournament">
+            <input type="submit" name="submit_new_tournament" value="Add a tournament">
     </form>
     <?= $msg2 ?>
 

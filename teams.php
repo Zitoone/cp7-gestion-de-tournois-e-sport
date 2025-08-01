@@ -4,6 +4,8 @@ require_once "config/connect.php";
 require_once "functions.php"; 
 
 $user_id=$_SESSION["id"];
+$user_role=$_SESSION["role"];
+
 $msg="";
 $IsError=false;
 

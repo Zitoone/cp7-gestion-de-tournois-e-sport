@@ -2,7 +2,8 @@
 session_start(); // On utilise les sessions ici pour que le navigateur enregistre certaines informations sur le navigateur
 require_once "config/connect.php";
 require_once "functions.php"; 
-
+/* $user_id=$_SESSION["id"];
+$user_role=$_SESSION["role"]; */
 $msg = "";
 // Je commence par une nouvelle vérification de ce nouveau formulaire, si les 2 champs sont remplis on récupère les données envoyées dont le mdp
 if (!empty($_POST["submit"])) {
@@ -44,6 +45,9 @@ if (!empty($_POST["submit"])) {
 
         <input type="submit" name="submit" value="Submit">
     </form>
+    <br>
     <?= $msg ?>
+    <br>
+    <a href="register.php">Create an account</a>
 </body>
 </html>

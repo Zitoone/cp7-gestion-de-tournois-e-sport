@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once "config/connect.php";
 require_once "functions.php";  //On commence par inserer a ce fichier le fichier de connexion a la bdd et celui des fonctions
 
@@ -32,7 +33,7 @@ if(!empty($_POST["register_submit"])){ // Si le formulaire nommé register_submi
         }else{ //Si c'est faux, on peut ajouter le nouvel utilisateur a la bdd avec une nouvelle fonction
             $request=addNewUser($pdo, $username, $email, $password);
             if($request){ // si la requete de la fonction s'est bien passée on a un msg de confirmation
-                $msg='<span style="color:green; font-weight:bold; font-size:120%;">Your account is create</span>';
+                $msg='<span style="color:green; font-weight:bold; font-size:120%;">Your account is create <a href="account.php">Account</a></span>';
                 $isError=false;
             }else{ // sinon un msg d'erreur
                 $msg='<span style="color:red; font-weight:bold; font-size:120%;">Registration failed</span>';
@@ -68,6 +69,8 @@ if(!empty($_POST["register_submit"])){ // Si le formulaire nommé register_submi
     </form>  
 
     <?= $msg ?>
+    <br>
+    <a href="connexion.php">Back</a>
     
 </body>
 </html>

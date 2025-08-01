@@ -67,15 +67,6 @@ function addTeam($pdo, $team_name, $user_id, $role="captain"){
     return false;
 }
 
-/* function getTeamNameById($pdo, $teamId) {
-    $stmt = $pdo->prepare("SELECT name FROM teams WHERE id = :id");
-    $stmt->execute(array(
-        "id" => $teamId
-    ));
-    $team = $stmt->fetch();
-    return $team["name"];
-} */
-
 function getTeamsFromConnectedUser($pdo,$user_id){
     $stmt=$pdo->prepare("SELECT t.id, t.name FROM teams t INNER JOIN team_members tm ON t.id=tm.team_id INNER JOIN users u ON u.id=tm.user_id WHERE u.id=:id AND tm.role_in_team='captain'");
     $stmt->execute(array(
@@ -126,6 +117,35 @@ function addTeamInTournament($pdo, $team_id, $tournament_id){
     return $stmt->rowCount();
 }
 
-function addNewTournament($pdo, $name, $game, $description, $stard, $end){
+function addNewTournament($pdo, $name, $game, $description, $start, $end,$user_id){
+    $stmt=$pdo->prepare("INSERT INTO tournaments(name, game, description, start_date, end_date, organizer_id) VALUES (:name, :game, :description, :start, :end, :organiser_id)");
+    $stmt->execute(array(
+        "name"=>$name,
+        "game"=>$game,
+        "description"=>$description,
+        "start"=>$start,
+        "end"=>$end,
+        "organiser_id"=>$user_id
+    ));
+    return $stmt->rowCount();
+}
 
+function modifyTournament($pdo, $name, $game, $description, $start, $end,$user_id){
+    $stmt=$pdo->prepare("UPDATE tournaments SET name=:name, game=:game, description=:description, start_date=:start, end_date=:end, organizer_id=:id");
+    $stmt->execute(array(
+        "name"=>$name,
+        "game"=>$game,
+        "description"=>$description,
+        "start"=>$start,
+        "end"=>$end
+    ));
+    return $stmt->rowCount();
+}
+
+function getTournamentById($pdo, $tournament_id){
+    $stmt=$pdo->prepare("SELECT * FROM tournaments WHERE id=:id");
+$stmt->execute(array(
+    'id'=>$tournament_id
+));
+$tournament=$stmt->fetchAll();
 }
