@@ -3,7 +3,6 @@ session_start();
 require_once "config/connect.php";
 require_once "functions.php"; 
 
-
 $msg="";
 $id = $_SESSION['id'];
 $stmt = $pdo->prepare("SELECT id, username, email, role FROM users WHERE id=:id");
@@ -11,13 +10,8 @@ $stmt->execute(array(
     'id' => $id
 ));
 $user = $stmt->fetch();
-if ($user) {
-    $_SESSION['id']=$user['id'];
-    $_SESSION['role'] = $user['role'];
-} else {
-    $msg="No user";
-}
 
+// Verif du form de modofication
 if(!empty($_POST["update"])){
     $username=$_POST["username"];
     $email=$_POST["email"];
@@ -28,9 +22,7 @@ if(!empty($_POST["update"])){
         $msg='<span style="color:red; font-weight:bold; font-size:120%;">Update failed</span>';
     }
 }
-
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,7 +34,6 @@ if(!empty($_POST["update"])){
     <h1>User account</h1>
 
 <form action="#" method="post">
-
     <input type="hidden" name="id" id="id" value="<?=$user['id'] ?>">
 
    <label for="username">Username :</label>
@@ -52,17 +43,13 @@ if(!empty($_POST["update"])){
    <input type="email" name="email" id="email" value="<?=$user['email'] ?>">
 
    <input type="submit" name="update" value="Update info">
-
 </form>
    <?= $msg ?>
-
    <br>
-
     <a href="logout.php">Log out</a>
     <br>
     <a href="teams.php">Teams</a>
     <br>
-    <a href="tournaments.php">Tournois</a>
-    
+    <a href="tournaments.php">Tournois</a>    
 </body>
 </html>

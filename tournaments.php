@@ -5,13 +5,6 @@ require_once "functions.php";
 
 $user_id=$_SESSION["id"];
 $user_role=$_SESSION["role"];
-if (isset($_POST['modify_tournament'])) {
-    $_SESSION['tournament_id'] = $_POST['modify_tournament'];
-    header('Location: modify_tournament.php');
-    exit;
-}
-
-
 $msg="";
 $isError= false;
 if(!empty($_POST["submit_add_tournament"])){
@@ -91,11 +84,9 @@ if(!empty($_POST["submit_new_tournament"])){
             <li>
                 <?= $tournament['name'] ?> 
                 <?php if($user_role=="organizer"):?>
-            <form method="POST" action="modify_tournament.php">
-                <button type="submit" name="tournament_id" value="<?= $tournament['id'] ?>">Modify</button>
-            </form>
-
-
+            <form method="GET" action="modify_tournament.php">
+                <input type="hidden" name="tournament_id" value="<?= $tournament['id'] ?>">
+                <button type="submit" >Modify</button>
             </form>
             <?php endif; ?>
 
@@ -171,11 +162,12 @@ if($user_role=="organizer"):?>
             <input type="submit" name="submit_new_tournament" value="Add a tournament">
     </form>
     <?= $msg2 ?>
-
 <?php endif; ?>
     <br>
+    <a href="teams.php">Teams</a>
+    <br>
+    <a href="account.php">Account</a>
+    <br>
     <a href="logout.php">Log out</a>
-
-
 </body>
 </html>

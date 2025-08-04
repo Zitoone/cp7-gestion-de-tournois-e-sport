@@ -7,7 +7,7 @@ function checkIfEmailExists($pdo, $email){
 ));
 $datas=$stmt->fetch();
 return($datas["nb"] >= 1) ? true : false;
-} // Pour cette fonction qui vérifie si l'email existe deja dans le bdd, on prepare donc une requete avec la fonction d'agreggation COUNT qui comptera le nombre de ligne de la colonne id ou l'email est présent. Si la reponse est: 0 mail present (faux), on peut ajouter le nouvel user mais si la réponse est 1 c'est vrai alors l'email existe deja
+} // Pour cette fonction qui vérifie si l'email existe deja dans le bdd, on prepare donc une requete avec la fonction d'agreggation COUNT qui comptera le nombre de ligne de la colonne id ou l'email est présent. Si la reponse est = 1 = true = l'email existe déja SINON = 0 pas d'email present = faux, on peut ajouter le nouvel user
 
 function addNewUser($pdo, $username, $email, $password){
     $stmt=$pdo->prepare("INSERT INTO users(username, email, password_hash) VALUES (:username, :email, :password)");
@@ -20,7 +20,7 @@ function addNewUser($pdo, $username, $email, $password){
 } // Cette fonction permet d'ajouter un nouvel utilisateur à la bdd avec la requête préparée INSERT INTO users. la metholde rowCount retournera le nombre de ligne affectée par la derniere requete
 
 function getUser($pdo, $email){
-    $stmt = $pdo->prepare("SELECT id, username, email, password_hash FROM users WHERE email = :email");
+    $stmt = $pdo->prepare("SELECT id, username, email, password_hash, role FROM users WHERE email = :email");
     $stmt->execute([
         "email" => $email
     ]);
@@ -130,14 +130,16 @@ function addNewTournament($pdo, $name, $game, $description, $start, $end,$user_i
     return $stmt->rowCount();
 }
 
-function modifyTournament($pdo, $name, $game, $description, $start, $end,$user_id){
-    $stmt=$pdo->prepare("UPDATE tournaments SET name=:name, game=:game, description=:description, start_date=:start, end_date=:end, organizer_id=:id");
+function modifyTournament($pdo, $name, $game, $description, $start, $end, $user_id,$tournament_id){
+    $stmt=$pdo->prepare("UPDATE tournaments SET name=:name, game=:game, description=:description, start_date=:start, end_date=:end, organizer_id=:organizer_id WHERE id=:tournament_id");
     $stmt->execute(array(
         "name"=>$name,
         "game"=>$game,
         "description"=>$description,
         "start"=>$start,
-        "end"=>$end
+        "end"=>$end,
+        "organizer_id"=>$user_id,
+        "tournament_id"=>$tournament_id
     ));
     return $stmt->rowCount();
 }
@@ -147,5 +149,5 @@ function getTournamentById($pdo, $tournament_id){
 $stmt->execute(array(
     'id'=>$tournament_id
 ));
-$tournament=$stmt->fetchAll();
+return $stmt->fetch();
 }

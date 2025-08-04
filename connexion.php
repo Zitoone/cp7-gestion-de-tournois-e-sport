@@ -1,22 +1,21 @@
 <?php
-session_start(); // On utilise les sessions ici pour que le navigateur enregistre certaines informations sur le navigateur
+session_start();
 require_once "config/connect.php";
 require_once "functions.php"; 
-/* $user_id=$_SESSION["id"];
-$user_role=$_SESSION["role"]; */
+
 $msg = "";
-// Je commence par une nouvelle vérification de ce nouveau formulaire, si les 2 champs sont remplis on récupère les données envoyées dont le mdp
 if (!empty($_POST["submit"])) {
     if (!empty($_POST["email"]) && !empty($_POST["password"])) {
         $email = $_POST['email'];
         $password = $_POST["password"];
 
-        $user = getUser($pdo, $email); // on appelle la fonction qui permettra de récupérer l'id et le mdp haché
+        $user = getUser($pdo, $email);
 
-        if ($user && password_verify($password, $user["password_hash"])) { //Ici on verifie que l'utilisateur existe et on utilise une fonction (native) qui vérifie si les mots de passe correspondent, si c'est le cas on enregistre l'ID dans les sessions et on est envoyé sur la page du compte (sinon on a un msg d'erreur)
+        if ($user && password_verify($password, $user["password_hash"])) {
             $_SESSION['id'] = $user['id'];
+            $_SESSION['role'] = $user['role'];
             header("Location: account.php");
-            exit();   // pour arrêter le script après redirection
+            exit();
         } else {
             $msg = '<span style="color:red; font-weight:bold; font-size:120%;">Username and password are not correct</span>';
         }
@@ -25,7 +24,6 @@ if (!empty($_POST["submit"])) {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>

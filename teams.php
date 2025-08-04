@@ -5,14 +5,11 @@ require_once "functions.php";
 
 $user_id=$_SESSION["id"];
 $user_role=$_SESSION["role"];
-
 $msg="";
 $IsError=false;
-
 //Gestion du form d'ajout de team en tant que capitaine
 if(!empty($_POST["submit"])){
     $team_name=$_POST["team-name"];
-
     if(empty($team_name)){
         $msg='<span style="color:red; font-weight:bold; font-size:120%;">Team name is required!</span>';
         $IsError=true;
@@ -26,7 +23,6 @@ if(!empty($_POST["submit"])){
     if(!$IsError){
         $lastId = addTeam($pdo, $team_name, $user_id, $role="captain");
         $msg='<span style="color:green; font-weight:bold; font-size:120%;">Your team has been created CAPTAIN ;)</span>';
-
     }
 }
 //Gestion du formulaire d'ajout de joueur dans une équipe
