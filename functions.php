@@ -160,3 +160,11 @@ $stmt->execute(array(
 ));
 return $stmt->fetch();
 }
+
+function deleteTournament($pdo, $tournament_id){
+    $stmt=$pdo->prepare("DELETE FROM tournaments WHERE id=:id");
+    $stmt->execute(array(
+        "id"=>$tournament_id
+    ));
+    return $stmt->rowCount();
+}   

@@ -7,16 +7,44 @@ $user_id=$_SESSION["id"];
 $user_role=$_SESSION["role"];
 $msg="";
 $isError= false;
+
+//Gestion de la suppression de tournois
+$msg_delete="";
+// Message de confirmation après redirection
+if(!empty($_GET["deleted"]) && $_GET["deleted"] == "success"){
+    $msg_delete = '<span style="color:green; font-weight:bold; font-size:120%;">Tournament has been deleted</span>';
+}
+if(!empty($_GET["delete_tournament"])){
+    $isError_delete = false;
+    if(empty($_GET["tournament_id"])){
+        $msg_delete= '<span style="color:red; font-weight:bold; font-size:120%;">Choose a tournament</span>';
+        $isError_delete=true;
+    }
+    if(!$isError_delete){
+        $tournament_id = $_GET["tournament_id"];
+        $request=deleteTournament($pdo, $tournament_id);
+        if($request){
+            // Redirection après suppression
+            header("Location: tournaments.php?deleted=success");
+            exit();
+        } else {
+            $msg_delete = '<span style="color:red; font-weight:bold; font-size:120%;">Something failed</span>';
+        }
+    }
+}
+
+//Gestion du form d'ajout d'équipe dans un tournoi
 if(!empty($_POST["submit_add_tournament"])){
+    $isError_team = false;
     if(empty($_POST["my-teams"])){
         $msg= '<span style="color:red; font-weight:bold; font-size:120%;">Choose a team</span>';
-        $isError=true;
+        $isError_team=true;
     }
     if(empty($_POST["tournaments"])){
         $msg= '<span style="color:red; font-weight:bold; font-size:120%;">Choose a tournament</span>';
-        $isError=true;
+        $isError_team=true;
     }
-    if(!$isError){
+    if(!$isError_team){
         $team_id=$_POST["my-teams"];
         $tournament_id=$_POST["tournaments"];
         $request=addTeamInTournament($pdo, $team_id, $tournament_id);
@@ -29,29 +57,29 @@ if(!empty($_POST["submit_add_tournament"])){
 }
 //Gestion du form d'ajout de nouveau tournois
 $msg2="";
-$isError=false;
 if(!empty($_POST["submit_new_tournament"])){
+    $isError_new = false;
     if(empty($_POST["name"])){
         $msg2= '<span style="color:red; font-weight:bold; font-size:120%;">Please enter the name of the tournament</span>';
-        $isError=true;
+        $isError_new=true;
     }
         if(empty($_POST["game"])){
         $msg2= '<span style="color:red; font-weight:bold; font-size:120%;">Please enter the game of the tournament</span>';
-        $isError=true;
+        $isError_new=true;
     }
         if(empty($_POST["description"])){
         $msg2= '<span style="color:red; font-weight:bold; font-size:120%;">Please enter the description of the tournament</span>';
-        $isError=true;
+        $isError_new=true;
     }
         if(empty($_POST["start"])){
         $msg2= '<span style="color:red; font-weight:bold; font-size:120%;">Please enter the start date of the tournament</span>';
-        $isError=true;
+        $isError_new=true;
     }
         if(empty($_POST["end"])){
         $msg2= '<span style="color:red; font-weight:bold; font-size:120%;">Please enter the end date of the tournament</span>';
-        $isError=true;
+        $isError_new=true;
     }
-    if(!$isError){
+    if(!$isError_new){
         $name=$_POST["name"];
         $game=$_POST["game"];
         $description=$_POST["description"];
@@ -88,12 +116,11 @@ if(!empty($_POST["submit_new_tournament"])){
                 <input type="hidden" name="tournament_id" value="<?= $tournament['id'] ?>">
                 <button type="submit" >Modify</button>
             </form>
+
             <?php endif; ?>
 
-            <?php if($user_role=="admin"):?>
-            <form method="POST" action="delete_tournament.php">
-                <button type="submit" name="delete_tournament">Delete</button>
-            </form>
+            <?php if($user_role=="admin" || $user_role=="organizer") :?>
+            <a href="?delete_tournament=1&tournament_id=<?= $tournament['id'] ?>">Delete</a>
             <?php endif; ?>
             
                 <ul>
@@ -105,12 +132,14 @@ if(!empty($_POST["submit_new_tournament"])){
             </li>
         <?php endforeach; ?>   
     </ul>
+                <?= $msg_delete ?>
+
 
     <h2>Add your team to a tournament</h2>
     <form action="#" method="post">
         <label for="my-teams">Teams: </label>
         <select name="my-teams" id="my-teams">
-         <option value="0">Please select your team</option>
+        <option value="0">Please select your team</option>
             <?php
             $teams=getTeamsFromConnectedUser($pdo, $user_id);
             foreach($teams as $team):
@@ -123,7 +152,7 @@ if(!empty($_POST["submit_new_tournament"])){
         <br>
         <label for="tournaments">Players: </label>
         <select name="tournaments" id="tournaments">
-         <option value="0">Please select a tournament</option>
+        <option value="0">Please select a tournament</option>
             <?php
             $tournaments_select=getTournaments($pdo);
             foreach($tournaments as $tournament):
@@ -136,8 +165,8 @@ if(!empty($_POST["submit_new_tournament"])){
         <br>
         <input type="submit" name="submit_add_tournament" value="Add">
 
-     </form>
-     <?= $msg ?>
+    </form>
+    <?= $msg ?>
 
 <!--Sera visible si l'utilisateur a un statut d'oraganisateur -->
 <?php
