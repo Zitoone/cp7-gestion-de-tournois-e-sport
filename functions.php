@@ -92,6 +92,15 @@ function addPlayerInTeam($pdo, $user_id, $team_id){
     return $stmt->rowCount();
 }
 
+function pullPlayerFromTeam($pdo, $user_id, $team_id){
+    $stmt=$pdo->prepare("DELETE FROM team_members WHERE user_id=:user_id AND team_id=:team_id");
+    $stmt->execute(array(
+        "user_id"=>$user_id,
+        "team_id"=>$team_id
+    ));
+    return $stmt->rowCount();
+}
+
 function getAllTeamsExceptUser($pdo, $user_id){
     $stmt=$pdo->prepare("SELECT DISTINCT t.id, t.name FROM teams t INNER JOIN team_members tm ON t.id=tm.team_id INNER JOIN users u ON u.id=tm.user_id WHERE tm.user_id!=:id");
     $stmt->execute(array(

@@ -48,6 +48,27 @@ if(!empty($_POST["submit_add_player"])){
         }
     }
 }
+//Gestion du formulaire de retrait de joueur dans une équipe
+if(!empty($_POST["submit_pull_player"])){
+    if(empty($_POST["my-teams"])){
+        $msg2= '<span style="color:red; font-weight:bold; font-size:120%;">Choose a team</span>';
+        $isError=true;
+    }
+    if(empty($_POST["players"])){
+        $msg2= '<span style="color:red; font-weight:bold; font-size:120%;">Choose a player</span>';
+        $isError=true;
+    }
+    if(!$isError){
+        $team_id=$_POST["my-teams"];
+        $player_id=$_POST["players"];
+        $request=pullPlayerFromTeam($pdo, $player_id, $team_id);
+        if($request){
+            $msg2 = '<span style="color:green; font-weight:bold; font-size:120%;">The player has been removed from the team!</span>';
+            } else {
+            $msg2 = '<span style="color:red; font-weight:bold; font-size:120%;">Something failed</span>';
+        }
+    }
+}
 // Gestion form d'ajout de l'utilisateur connecté dans une autre équipe que la sienne
 $msg3="";
 $isError=false;
